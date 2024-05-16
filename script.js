@@ -27,3 +27,15 @@ form.addEventListener('submit', function(event) {
 
     elementExists(projects, projectID);
 });
+
+window.updateProjectData = function(updatedProjectData) {
+    // Find the project in projects object and update its data
+    for (const projectKey in projects) {
+        if (JSON.stringify(projects[projectKey]) === JSON.stringify(updatedProjectData)) {
+            projects[projectKey] = updatedProjectData;
+            console.log(`Project data updated for ${projectKey}:`, updatedProjectData);
+            return; // Exit the loop once project data is updated
+        }
+    }
+    console.error('Project data not found in projects object.');
+};
