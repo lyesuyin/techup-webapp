@@ -56,29 +56,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const submitButton = document.getElementById('submitButton');
-if (submitButton) {
-    submitButton.addEventListener('click', function() {
-        // Get the input value
-        const inputValue = inputField.value;
-        
-        // Retrieve the projectData array from the URL parameters
-        const params = new URLSearchParams(window.location.search);
-        let projectData;
-        try {
-            projectData = JSON.parse(params.get('projectData'));
-        } catch (error) {
-            console.error('Error parsing project data:', error);
-            return;
-        }
+    if (submitButton) {
+        submitButton.addEventListener('click', function() {
+            // Get the input value
+            const inputValue = inputField.value;
 
-        // Add the user input into the projectData array
-        projectData.push(inputValue);
+            // Add the user input into the projectData array
+            projectData.push(inputValue);
 
-        // Update the project data in script.js
-        window.updateProjectData(projectData);
+            // Update the project data in script.js
+            window.updateProjectData(projectData);
 
-        // Optional: Navigate to another page or perform additional actions
-    });
-}
-    
+            // Optional: Perform additional actions, like navigating to another page
+        });
+    }
 });

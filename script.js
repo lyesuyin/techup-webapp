@@ -1,6 +1,6 @@
 const projects = {
     project1: ['CDB_MTI_2401', 'MTI Database', '302000', '7', 'Number of businesses helped', '3000'],
-    project2: ["IB_MOH_2303", "MOH System", "11200000", "30", "Reduction in patient wait time", "30mins","15mins"],
+    project2: ["IB_MOH_2303", "MOH System", "11200000", "30", "Reduction in patient wait time", "30mins", "15mins"],
     project3: ["CDB_Govtech_2211", "API Connect", "1500000", "100000000", "Cost savings", "$100 million"]
 };
 
@@ -17,6 +17,7 @@ form.addEventListener('submit', function(event) {
                 // Pass the array associated with the project ID as a URL parameter
                 const params = new URLSearchParams();
                 params.append('projectData', JSON.stringify(projects[projectKey]));
+                params.append('projectID', projectID); // Pass the project ID as a parameter
                 // Proceed to the next page with the URL parameters
                 window.location.href = `project-details.html?${params.toString()}`;
                 return; // Exit the function once project ID is found
@@ -30,8 +31,9 @@ form.addEventListener('submit', function(event) {
 
 window.updateProjectData = function(updatedProjectData) {
     // Find the project in projects object and update its data
+    const projectID = updatedProjectData[0];
     for (const projectKey in projects) {
-        if (JSON.stringify(projects[projectKey]) === JSON.stringify(updatedProjectData)) {
+        if (projects[projectKey][0] === projectID) {
             projects[projectKey] = updatedProjectData;
             console.log(`Project data updated for ${projectKey}:`, updatedProjectData);
             return; // Exit the loop once project data is updated
