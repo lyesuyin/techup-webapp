@@ -18,10 +18,12 @@ const thankYou = document.getElementById('thankYou');
 const submit = document.getElementById('submit');
 const backButton1 = document.getElementById('backButton1');
 const backButton2 = document.getElementById('backButton2');
+const backButton3 = document.getElementById('backButton3');
 const nextButton = document.getElementById('nextButton');
 const submitButton = document.getElementById('submitButton');
 const newFormButton = document.getElementById('newFormButton');
-const userIDField = document.getElementById('userIDField');
+const userCredentialsForm = document.getElementById('userCredentialsForm');
+const membersWelcome = document.getElementById('membersWelcome');
 const membersTable = document.getElementById('membersTable');
 const logIn = document.getElementById('logIn');
 const logOut = document.getElementById('logOut');
@@ -32,14 +34,16 @@ const logOut = document.getElementById('logOut');
 backButton1.style.display = 'none';
 submit.style.display = 'none';
 backButton2.style.display = 'none';
+backButton3.style.display = 'none';
 nextButton.style.display = 'none';
 projDetails.style.display = 'none';
 thankYou.style.display = 'none';
 submitButton.style.display = 'none';
 newFormButton.style.display = 'none';
-userIDField.style.display = 'none';
+userCredentialsForm.style.display = 'none';
 membersTable.style.display = 'none';
 logOut.style.display = 'none';
+membersWelcome.style.display = 'none';
 
 //define form at add functionality to button when user submits projectid
 const form = document.getElementById('projectIDForm');
@@ -72,6 +76,7 @@ function elementExists(projects, projectID) {
             // Hide the form
             form.style.display = 'none';
             start.style.display = 'none';
+            logIn.style.display = 'none';
             // Display buttons and para
             backButton1.style.display = 'inline';
             nextButton.style.display = 'inline';
@@ -113,7 +118,6 @@ function elementExists(projects, projectID) {
                     return; // Abort the function if user input is empty
                 }
                 const confirmed = confirm(`Are you sure you want to save "${userInput}"?`);
-    
                 if (!confirmed) {
                     // User cancelled the operation
                     return;
@@ -258,6 +262,7 @@ function regenerateTable(projectID) {
         nextButton.style.display = 'none';
         projDetails.style.display = 'none';
         submitButton.style.display = 'none';
+        logIn.style.display = 'inline';
     }
 
 function removeLastColumn() {
@@ -313,62 +318,6 @@ function generateFullTable(projects) {
 }
 
 
-function resetAndReturnHome() {
-    // Clear any displayed elements related to project details
-    const tableContainer = document.getElementById('table-container');
-    tableContainer.innerHTML = ''; // Clear the table
-    projDetails.style.display = 'none';
-    backButton1.style.display = 'none';
-    backButton2.style.display = 'none';
-    submitButton.style.display = 'none';
-    thankYou.style.display = 'none';
-    membersTable.style.display = 'none';
-    newFormButton.style.display = 'none';
-
-    // Reset the form to clear user input
-    if (form) {
-        form.reset();
-    }
-
-    // Display the form
-    form.style.display = 'block';
-    start.style.display = 'block';
-
-    // Hide the user credentials form
-    if (userCredentialsForm) {
-        userCredentialsForm.style.display = 'none';
-        // Remove the event listener for userCredentialsForm
-        if (userCredentialsFormListener) {
-            userCredentialsForm.removeEventListener('submit', userCredentialsFormListener);
-        }
-    }
-
-    // Hide the table and buttons
-    backButton1.style.display = 'none';
-    backButton2.style.display = 'none';
-    nextButton.style.display = 'none';
-    projDetails.style.display = 'none';
-    submitButton.style.display = 'none';
-
-    // Show the home page elements
-    document.querySelector('h1').style.display = 'inline';
-    document.querySelector('h3').style.display = 'inline';
-
-    // Hide the "Back to Home" button
-    const backToHome = document.getElementById('backToHome');
-    if (backToHome) {
-        backToHome.style.display = 'none';
-    }
-
-    
-}
-
-
-
-
- 
-// Get the userCredentialsForm element
-const userCredentialsForm = document.getElementById('userCredentialsForm');
 
 // Add event listener for form submission
 userCredentialsForm.addEventListener('submit', handleUserCredentialsSubmit);
@@ -391,7 +340,44 @@ function handleUserCredentialsSubmit(event) {
     } else {
         alert('Invalid userID. Please try again.');
     }
+    return false; 
 }
+
+// Add functionality to logIn button
+logIn.addEventListener('click', function() {
+    form.style.display = 'none';
+    userCredentialsForm.style.display = 'block';
+    // Reset the form if necessary
+    if (userCredentialsForm) {
+        userCredentialsForm.reset();
+    }
+    membersWelcome.style.display = 'inline';
+    logIn.style.display = 'none';
+    start.style.display = 'none';
+    backButton3.style.display = 'inline';
+    document.querySelector('h1').style.display = 'none';
+    document.querySelector('h3').style.display = 'none';
+    logInButton.style.display = 'none';
+});
+
+// Add functionality to logIn button
+backButton3.addEventListener('click', function() {
+    form.style.display = 'block';
+    userCredentialsForm.style.display = 'none';
+    // Reset the form if necessary
+    if (userCredentialsForm) {
+        userCredentialsForm.reset();
+    }
+    membersWelcome.style.display = 'none';
+    logIn.style.display = 'inline';
+    start.style.display = 'inline';
+    backButton3.style.display = 'none';
+    document.querySelector('h1').style.display = 'inline';
+    document.querySelector('h3').style.display = 'inline';
+    logInButton.style.display = 'inline';
+});
+
+
 
 
 function runFunctionForValidCredentials() {
@@ -399,9 +385,11 @@ function runFunctionForValidCredentials() {
 
     // Hide the form
     document.getElementById('userCredentialsForm').style.display = 'none';
+    logIn.style.display = 'none';
 
     // Hide the welcome message (if any)
     document.getElementById('membersWelcome').style.display = "none";
+    backButton3.style.display = 'none';
 
     // Display the members table and logout button
     document.getElementById('membersTable').style.display = "inline";
@@ -419,12 +407,15 @@ function resetPageToInitialState() {
     document.getElementById('membersTable').style.display = "none";
     document.getElementById('logOut').style.display = 'none';
 
+    const tableContainer = document.getElementById('table-container');
+    tableContainer.innerHTML = ''; // Clear the table
+
     // Display the login button and initial elements
     form.style.display = 'block';
     start.style.display = 'block';
     document.querySelector('h1').style.display = 'block';
     document.querySelector('h3').style.display = 'block';
-    logInButton.style.display = 'block';
+    logIn.style.display = 'inline';
 
     // Reset the form if necessary
     if (form) {
@@ -432,13 +423,11 @@ function resetPageToInitialState() {
     }
 
     // Hide the user ID field
-    userIDField.style.display = 'none';
+    userCredentialsForm.style.display = 'none';
+    membersWelcome.style.display = 'none';
 
-    const tableContainer = document.getElementById('table-container');
-    tableContainer.innerHTML = ''; // Clear the table
+
 }
-
-
 
 
 document.getElementById('logOut').addEventListener('click', function() {
@@ -446,16 +435,3 @@ document.getElementById('logOut').addEventListener('click', function() {
 
 });
 
-// Add functionality to logIn button
-logIn.addEventListener('click', function() {
-    resetPageToInitialState; 
-    form.style.display = 'none';
-    userIDField.style.display = 'block';
-    if (form) {
-        form.reset();
-    }
-    start.style.display = 'none';
-    document.querySelector('h1').style.display = 'none';
-    document.querySelector('h3').style.display = 'none';
-    logInButton.style.display = 'none';
-});
