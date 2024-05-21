@@ -1,33 +1,43 @@
+//define project data 
+const projects = {
+    'CDB_MTI_2401': ['CDB_MTI_2401', 'MTI Database', '302000', '7', 'Number of businesses helped', '3000'],
+    'IB_MOH_2303': ['IB_MOH_2303', 'MOH System', "11200000", "30", "Reduction in patient wait time", "30mins","15mins","17mins","20mins"],
+    'CDB_Govtech_2211': ['CDB_Govtech_2211', "API Connect", "1500000", "100000000", "Cost savings", "$100 million"]
+};
 
+
+//define buttons 
 const projDetails = document.getElementById('projDetails');
+const thankYou = document.getElementById('thankYou');
+const submit = document.getElementById('submit');
 const backButton1 = document.getElementById('backButton1');
 const backButton2 = document.getElementById('backButton2');
 const nextButton = document.getElementById('nextButton');
 const submitButton = document.getElementById('submitButton');
+const newFormButton = document.getElementById('newFormButton');
+const viewAllButton = document.getElementById('viewAllButton');
+const userIDField = document.getElementById('userIDField');
+const membersTable = document.getElementById('membersTable');
 
+
+
+//hide buttons not used on 1st page
 backButton1.style.display = 'none';
+submit.style.display = 'none';
 backButton2.style.display = 'none';
 nextButton.style.display = 'none';
 projDetails.style.display = 'none';
+thankYou.style.display = 'none';
 submitButton.style.display = 'none';
+newFormButton.style.display = 'none';
+userIDField.style.display = 'none';
+membersTable.style.display = 'none';
 
+const backToHome = document.getElementById('backToHome').style.display = "none";
 
-
-
-const projects = {
-    project1: ['CDB_MTI_2401', 'MTI Database', '302000', '7', 'Number of businesses helped', '3000'],
-    project2: ["IB_MOH_2303", "MOH System", "11200000", "30", "Reduction in patient wait time", "30mins","15mins","17mins","20mins"],
-    project3: ["CDB_Govtech_2211", "API Connect", "1500000", "100000000", "Cost savings", "$100 million"]
-};
-
-
-
-
-
+//define form at add functionality to button when user submits projectid
 const form = document.querySelector('form');
 const start = document.getElementById('start');
-
-
 
 form.addEventListener('submit', function(event) {
     event.preventDefault(); // prevent default form submission behavior
@@ -37,13 +47,24 @@ form.addEventListener('submit', function(event) {
 
     console.log('Form submitted with projectID:', projectID);
 
+    if (projectID === '99999') {
+        // Display the field to enter user ID and password
+        document.getElementById('userIDField').style.display = 'inline';
+        form.style.display = "none";
+        viewAllButton.style.display = "none"
+        document.querySelector('h1').style.display = 'none';
+        document.querySelector('h3').style.display = 'none';
+        start.style.display = "none";
+        return;
+    }
+
     function elementExists(projects, projectID) {
         for (const projectKey in projects) {
             if (projects[projectKey].includes(projectID)) {
                 // Pass the array associated with the project ID
                 const projectData = projects[projectKey];
                 // Call the generateTable function with the project data
-                generateTable(projectData);
+                generateTable(projectData,projectID);
                 // Hide the form
                 form.style.display = 'none';
                 start.style.display = 'none';
@@ -55,20 +76,18 @@ form.addEventListener('submit', function(event) {
                 // Add functionality to the back button (ensuring it's added only once)
                 backButton1.onclick = function() {
                     // Reset the form to clear user input
-                    if (form) {
-                        form.reset();
-                    }
-                    // Reload the page to return to the start of JavaScript code
-                    location.reload();
+                    resetForm()
                 };
 
                 // Add functionality to the next button (ensuring it's added only once)
                 nextButton.onclick = function() {
-                    addColumnWithInput();
+                    addColumnWithInput(projectID);
                     nextButton.style.display = 'none';
                     backButton1.style.display = 'none';
                     backButton2.style.display = 'inline';
                     submitButton.style.display = 'inline';
+                    projDetails.style.display = 'none';
+                    submit.style.display = 'inline';
                 };
 
                 // Add functionality to backButton2 (ensuring it's added only once)
@@ -78,17 +97,43 @@ form.addEventListener('submit', function(event) {
                     backButton1.style.display = 'inline';
                     backButton2.style.display = 'none';
                     submitButton.style.display = 'none';
+                    projDetails.style.display = 'inline';
+                    submit.style.display = 'none';
                 };
 
 
-                // Add functionality to submitButton (ensuring it's added only once)
                 submitButton.onclick = function() {
-                    removeLastColumn();
-                    nextButton.style.display = 'inline';
-                    backButton1.style.display = 'inline';
-                    backButton2.style.display = 'none';
-                    submitButton.style.display = 'none';
+                    const userInput = document.getElementById('inputField').value.trim(); 
+                    // Validate user input
+                    if (!userInput) {
+                    alert('User input is empty. Please enter some data.');
+                    return; // Abort the function if user input is empty
+                    }
+                        handleSubmitButtonClick(projectID);
+                        regenerateTable(projectID);
+                        thankYou.style.display = 'inline';
+                        newFormButton.style.display = 'inline';
+                        projDetails.style.display = 'none';
+                        backButton2.style.display = 'none';
+                        submitButton.style.display = 'none';
+                        submit.style.display = 'none';
                 };
+
+                newFormButton.onclick = function() {
+                    resetForm();
+                    thankYou.style.display = 'none';
+                    newFormButton.style.display = 'none';
+
+                };
+                
+                viewAllButton.onclick = function() {
+                    generateFullTable(projects);
+                    thankYou.style.display = 'none';
+                    newFormButton.style.display = 'none';
+
+                };
+
+
                 return; // Exit the function once project ID is found
             }
         }
@@ -97,11 +142,13 @@ form.addEventListener('submit', function(event) {
 
     // Assume `projects` and `projectID` are defined
     elementExists(projects, projectID);
+
 });
 
 
+
 // Function to generate the dynamic table
-function generateTable(projectData) {
+function generateTable(projectData,projectID) {
     // Define column titles from a separate array
     const columnTitlesArray = ['Project ID', 'Project Name', 'Approved Funding', 'Approved MMF', 'Outcome Metric', 'Target', '6-mth Achievement', '1-yr Achievement','1.5-yr Achievement', '2-yr Achievement'];
     const columnTitles = columnTitlesArray.slice(0, projectData.length);
@@ -127,7 +174,7 @@ function generateTable(projectData) {
     document.getElementById('table-container').appendChild(table);
 }
 
-function addColumnWithInput() {
+function addColumnWithInput(projectID) {
     const tableContainer = document.getElementById('table-container');
     const table = tableContainer.querySelector('table');
     const columnTitlesArray = ['Project ID', 'Project Name', 'Approved Funding', 'Approved MMF', 'Outcome Metric', 'Target', '6-mth Achievement', '1-yr Achievement', '1.5-yr Achievement', '2-yr Achievement'];
@@ -148,9 +195,67 @@ function addColumnWithInput() {
         const newRowCell = dataRows[i].insertCell();
         const inputField = document.createElement('input');
         inputField.type = 'text';
+        inputField.id = 'inputField'; 
         newRowCell.appendChild(inputField);
+    }}
+
+    function handleSubmitButtonClick(projectID) {
+        // Assuming userInput contains the new value to be added
+        const userInput = document.getElementById('inputField').value.trim(); 
+    
+        // Validate user input
+        if (!userInput) {
+            alert('User input is empty. Please enter some data.');
+            return; // Abort the function if user input is empty
+        }
+    
+        // Check if the projectID exists in the projects object
+        if (!projects.hasOwnProperty(projectID)) {
+            console.log(`Project ID "${projectID}" not found in the projects object.`);
+            console.log('Available Project IDs:', Object.keys(projects));
+            return; // Abort the function if projectID does not exist
+        }
+    
+        // Push user input into the relevant array in the projects object
+        projects[projectID].push(userInput);
+        console.log('Updated projects:', projects);
+        console.log('User input saved successfully!');
     }
+    
+
+    
+function regenerateTable(projectID) {
+    const updatedData = projects[projectID]; // Get the updated array
+
+    // Hard code the updatedData into the projects object
+    projects[projectID] = updatedData;
+
+    const tableContainer = document.getElementById('table-container');
+    
+    // Clear existing table
+    tableContainer.innerHTML = '';
+
+    // Generate new table with updated data
+    generateTable(updatedData);
 }
+
+    function resetForm() {
+        // Reset the form to clear user input
+        if (form) {
+            form.reset();
+        }
+        // Show the form again
+        form.style.display = 'block';
+        start.style.display = 'block';
+        // Hide the table and buttons
+        const tableContainer = document.getElementById('table-container');
+        tableContainer.innerHTML = ''; // Clear the table
+        backButton1.style.display = 'none';
+        backButton2.style.display = 'none';
+        nextButton.style.display = 'none';
+        projDetails.style.display = 'none';
+        submitButton.style.display = 'none';
+    }
 
 function removeLastColumn() {
     const tableContainer = document.getElementById('table-container');
@@ -167,3 +272,106 @@ function removeLastColumn() {
     }
 }
 
+function generateFullTable(projects) {
+    // Find the maximum number of items in any project array
+    let maxItems = 0;
+    for (const projectKey in projects) {
+        const projectData = projects[projectKey];
+        maxItems = Math.max(maxItems, projectData.length);
+    }
+
+    // Define column titles based on the maximum number of items
+    const columnTitles = ['Project ID', 'Project Name', 'Approved Funding', 'Approved MMF', 'Outcome Metric', 'Target', '6-mth Achievement', '1-yr Achievement', '1.5-yr Achievement', '2-yr Achievement'].slice(0, maxItems);
+
+    // Generate the dynamic table
+    const table = document.createElement('table');
+
+    // Add column titles as the first row
+    const headerRow = table.insertRow();
+    for (const title of columnTitles) {
+        const headerCell = headerRow.insertCell();
+        headerCell.textContent = title;
+    }
+
+    // Add project data rows
+    for (const projectKey in projects) {
+        const projectData = projects[projectKey];
+        const dataRow = table.insertRow();
+        for (let i = 0; i < maxItems; i++) {
+            const cell = dataRow.insertCell();
+            cell.textContent = projectData[i] || '-'; // Show '-' for empty cells
+        }
+    }
+
+    // Append the table to a container in your HTML, e.g., <div id="table-container"></div>
+    const tableContainer = document.getElementById('table-container');
+    tableContainer.innerHTML = ''; // Clear previous content
+    tableContainer.appendChild(table);
+}
+
+const userCredentials = {
+    'user1': 'hi',
+    'user2': 'password2',
+    'user3': 'password3'
+};
+
+
+const userCredentialsForm = document.getElementById('userCredentialsForm');
+
+userCredentialsForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const userID = document.getElementById('userID').value;
+    const password = document.getElementById('password').value;
+
+    // Check if the userID exists in the userCredentials object
+    if (userCredentials.hasOwnProperty(userID)) {
+        // Check if the entered password matches the associated password
+        if (userCredentials[userID] === password) {
+            // Run your function if both userID and password are valid
+            runFunctionForValidCredentials();
+            
+        } else {
+            alert('Incorrect password. Please try again.');
+        }
+    } else {
+        alert('Invalid userID. Please try again.');
+    }
+
+});
+
+function runFunctionForValidCredentials() {
+    generateFullTable(projects);
+    // Hide the form
+    userCredentialsForm.style.display = 'none';
+    const membersWelcome = document.getElementById('membersWelcome').style.display = "none";
+    const backToHome = document.getElementById('backToHome');
+    membersTable.style.display = "inline";
+    backToHome.style.display = "inline";
+    
+    // Add event listener to the "Back to Home" button
+    backToHome.onclick = function() {
+        // Clear the displayed table content
+        const tableContainer = document.getElementById('table-container');
+        tableContainer.innerHTML = '';
+        // Hide any displayed elements related to project details
+        projDetails.style.display = 'none';
+        backButton1.style.display = 'none';
+        backButton2.style.display = 'none';
+        submitButton.style.display = 'none';
+        thankYou.style.display = 'none';
+        membersTable.style.display = 'none';
+        newFormButton.style.display = 'none';
+        // Show the form for submitting the project ID
+        form.style.display = 'block';
+        start.style.display = 'block';
+        if (form) {
+            form.reset();
+        }
+        // Hide the "Back to Home" button
+        backToHome.style.display = 'none';
+        document.querySelector('h1').style.display = 'inline';
+        document.querySelector('h3').style.display = 'inline';
+        
+    };
+}
